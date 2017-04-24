@@ -1,0 +1,286 @@
+<!doctype html>
+<html>
+<head>
+<meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<title>Beside The Park</title>
+<link rel='stylesheet' href='assets/css/style.css'>
+
+</style>
+</head>
+<body>
+
+	<div class='top'>
+		<div class='navbar js-navbar'>
+			<div class='logo'>
+				<h1>Beside The Park</h1>
+			</div>
+			<div class='bars'>
+				<a href='javascript:void(0)' class='bar js-open'>
+					<img src='assets/images/bar.png' style='100%'>
+				</a>
+				<a href='javascript:void(0)' class='search search-hide'>
+					<img src='assets/images/search.png' style='100%'>
+				</a>
+			</div>
+			<img src='assets/images/top-bar.png' style='width:100%'>
+		</div>
+
+		<!-- Sidenav/menu -->
+		<nav class='sidenav sidenav-hide js-sidenav'>
+			<a href='javascript:void(0)' class='button closenav js-open'>Close &times;</a>
+			<a href='#zespol' class='button'>Zespół</a>
+			<a href='#prace' class='button'>Prace</a>
+			<a href='#ceny' class='button'>Ceny</a>
+			<a href='#kontakt' class='button'>Kontakt</a>
+			<a href='#' class='button button-hide'>Szukaj</a>
+		</nav>
+	</div>
+	
+	<!-- Header -->
+	<header class='header bgimg noparallax'>
+		<div class='text-display'>
+			<div class='row-padding'>
+				<div class='half'>
+					<h1>Lorem Ipsum</h1>
+					<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis viverra dolor nec ipsum feugiat, in pretium purus tincidunt.</p>
+
+				</div>
+				<div class='half'></div>
+			</div>
+		</div>
+	</header>
+	
+	<div style='position:relative' class='iphone'>
+		<img src='assets/images/iphone.png' ></div>
+	</div>
+	
+	<!-- Content -->
+	<div class='container'>
+		<div class='content'>
+			<div class='js-content'></div>
+			
+			<div class='squares js-animate-main'>
+				<div class='twothird grey'>
+					<div class='margin'>
+						<h1>Donec non justo porta</h1>
+						<p>Donec non justo porta, venenatis lacus in, cursus nisi. Sed diam dui, elementum condimentum pharetra ac, ultricies ut nunc.</p>
+						<a herf='#'>Find Out more</a>
+					</div>
+				</div>
+				<div class='third green'>
+					<div class='margin'>
+						<h1>Donec non</h1>
+						<p>Donec non justo porta, venenatis lacus in, cursus nisi.</p>
+						<a herf='#'>Find Out more</a>
+					</div>
+				</div>
+
+				<div class='twothird indigo'>
+					<div class='margin'>
+						<h1>Donec non justo porta</h1>
+						<p>Donec non justo porta, venenatis lacus in, cursus nisi. Sed diam dui, elementum condimentum pharetra ac, ultricies ut nunc.</p>
+						<a herf='#'>Find Out more</a>
+					</div>
+				</div>
+				<div class='third light-green'>
+					<div class='margin'>
+						<h1>Justo porta</h1>
+						<p>Donec non justo porta, venenatis lacus in, cursus nisi.</p>
+						<a herf='#'>Find Out more</a>
+					</div>
+				</div>
+			</div>
+			
+			<footer class='footer'>
+				<p>All Rights Reserved &copy;</p>
+			</footer>
+		</div>
+	</div>
+	
+
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.6/handlebars.min.js'></script>
+<script>
+$(document).ready(() => {
+	const $wrapper = $('.js-content');
+
+	navbarAction();
+	loadArticles($wrapper);
+	animateSquares();
+	
+	$wrapper.on('click', (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+	});
+	$wrapper.on(
+		'click',
+		'.js-load-more',
+		handleLoadMore
+	);	
+	$wrapper.on(
+		'click',
+		'.js-unload-more',
+		handleUnloadMore
+	);
+
+	function navbarAction() {
+		let $navbar = $('.js-navbar');
+		
+		$(window).scroll(() => {
+			if ($(document).scrollTop() > 200) {
+				$navbar.addClass('card');
+				$navbar.addClass('white');
+			} else {
+				$navbar.removeClass('card');
+				$navbar.removeClass('white');
+			}
+		});
+		
+		$('.js-open').on('click', () => {
+			if($('.js-sidenav').hasClass('sidenav-hide')) {
+				$('.js-sidenav').removeClass('sidenav-hide');
+				$navbar.addClass('white');
+				$navbar.removeAttr('style');
+				$navbar.find('.bar').removeAttr('style');
+				$navbar.find('.search').removeAttr('style');
+			} else {
+				$('.js-sidenav').addClass('sidenav-hide');
+				$navbar.removeClass('white');
+			}
+		});
+	};
+	
+	function loadArticles($wrapper) {
+		$.ajax({
+			url: 'data.json',
+			success: (result) => {
+				let tplText = $('#text-template').html();
+				let tpl = Handlebars.compile(tplText);
+				let html = tpl(result);
+				
+				$wrapper.append(html);
+			}
+		});
+	};
+	
+	function handleLoadMore(e) {
+		let $div = $(this).closest('div');
+		let articleNumber = $div.data('id');
+		
+		let $buttons = $wrapper.find('.js-unload-more');
+		$.each($buttons, (key, value) => {
+			$(value).prev().find('.js-more').fadeOut('normal', () => {
+				$(value).html('Więcej');
+				$(value).addClass('js-load-more');
+				$(value).removeClass('js-unload-more');
+				$(value).prev().find('.js-more').remove();
+			});
+		});
+
+		let $link = $(e.currentTarget);
+		
+		if($(this).hasClass('js-load-more')) {
+			$.ajax({
+				url: 'data.json',
+				success: (result) => {
+					let tplText = $('#text-template').html();
+					let tpl = Handlebars.compile(tplText);
+					let html = tpl(result);
+
+					let $span = $('<span></span>');
+					$span.addClass('js-more');
+					$div.find('p').append($span);
+					$span.html(result.articles[articleNumber].more);
+					$link.addClass('js-unload-more test-' + articleNumber);
+					$link.removeClass('js-load-more');
+					$link.html('Mniej');
+				}
+			});
+		}
+	};
+	
+	function handleUnloadMore(e) {
+		let $link = $(e.currentTarget);
+		
+		if($(this).hasClass('js-unload-more')) {
+			$('.js-more').fadeOut('normal', () => {
+				$link.html('Więcej');
+				$link.addClass('js-load-more');
+				$link.removeClass('js-unload-more');
+				$('.js-more').remove();
+			});
+		}
+	};
+	
+	function animateSquares() {
+		let win = $(window);
+		
+		let $mainContent = $('.js-content');
+		let $mainSquare = $('.js-animate-main');
+
+		if ($mainContent.visible(true)) {
+			$mainContent.animate({opacity: '1'}, 'slow');
+		}
+
+		win.scroll((event) => {
+			if($mainContent.visible(true)) {
+				$mainContent.animate({opacity: '1'}, 'slow');
+			}
+			if($mainSquare.visible(true)) {
+				$mainSquare.animate({opacity: '1'}, 'slow');
+			}
+		});
+	};
+});
+
+(($) => {
+  $.fn.visible = function(partial) {
+      const $t          = $(this),
+          $w            = $(window),
+          viewTop       = $w.scrollTop(),
+          viewBottom    = viewTop + $w.height(),
+          _top          = $t.offset().top,
+          _bottom       = _top + $t.height(),
+          compareTop    = partial === true ? _bottom : _top,
+          compareBottom = partial === true ? _top : _bottom;
+    
+    return ((compareBottom <= viewBottom) && (compareTop >= viewTop));
+  };
+})(jQuery);
+
+Handlebars.registerHelper("ifvalue", function(conditional, options) {
+    if (conditional == options.hash.equals) {
+        return options.fn(this);
+    } else {
+        return options.inverse(this);
+    }
+});
+</script>
+
+<script id='text-template' type='text/x-handlebars-template'>
+	<div class='row-padding'>	
+		<h1>{{title}}</h1>
+		{{#each articles}}
+			{{#ifvalue id equals="0"}}
+				<div class='row'>
+					<div class='half' data-id="{{id}}">
+						<h4 class='text-grey'>{{title}}</h4>
+						<p class='text-dark-grey'>{{content}}</p>
+						<button class='more js-load-more'>Więcej</button>
+					</div>
+				</div>
+			{{else}}
+				<div class='half' data-id="{{id}}">
+					<h4 class='text-grey'>{{title}}</h4>
+					<p class='text-dark-grey'>{{content}}</p>
+					<button class='more js-load-more'>Więcej</button>
+				</div>
+			{{/ifvalue}}
+		{{/each}}
+	</div>
+</script>
+  
+</body>
+</html>
